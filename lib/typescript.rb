@@ -76,5 +76,9 @@ module TypeScript
 
       Source.context.call("RubyTypeScriptCompiler", Source.lib_contents, script, options)
     end
+
+    def test
+      puts ">>>" + compile('/// <reference path="jquery.d.ts" /> jQuery(document).ready(function() { alert("hello!"); });')
+    end
   end
 end
