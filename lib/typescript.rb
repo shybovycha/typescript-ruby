@@ -1,3 +1,5 @@
+$LOAD_PATH << File.dirname(__FILE__)
+
 require 'execjs'
 require 'typescript/source'
 
@@ -14,8 +16,8 @@ module TypeScript
       @compiler_path ||= ENV['TYPESCRIPT_COMPILER_PATH'] || compiler_bundled_path
     end
 
-    def self.lib_path
-      @lib_path ||= ENV['TYPESCRIPT_LIB_PATH'] || lib_bundled_path
+    def self.lib_paths
+      @lib_path ||= ENV['TYPESCRIPT_LIB_PATH'] || lib_bundled_paths
     end
 
     def self.path=(path)
@@ -28,7 +30,13 @@ module TypeScript
     end
 
     def self.lib_contents
-      @lib_contents ||= File.read(lib_path)
+      if lib_paths.is_a? Array
+        lib_paths.collect do |lib|
+          @lib_contents ||= File.read(lib)
+        end.join "\n"
+      else lib_paths.is_a? String
+        @lib_contents ||= File.read(lib_paths)
+      end
     end
 
     def self.version
