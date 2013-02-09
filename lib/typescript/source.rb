@@ -9,7 +9,10 @@ module TypeScript
     end
 
     def self.lib_bundled_paths
-      File.expand_path("../lib.d.ts", __FILE__)
+      [
+        File.expand_path("../lib.d.ts", __FILE__),
+        File.expand_path("../jquery.d.ts", __FILE__)
+      ]
     end
   end
 end

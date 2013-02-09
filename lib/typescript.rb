@@ -1,6 +1,7 @@
 $LOAD_PATH << File.dirname(__FILE__)
 
 require 'execjs'
+require 'json'
 require 'typescript/source'
 
 module TypeScript
@@ -31,8 +32,8 @@ module TypeScript
 
     def self.lib_contents
       if lib_paths.is_a? Array
-        lib_paths.collect do |lib|
-          @lib_contents ||= File.read(lib)
+        @lib_contents ||= lib_paths.collect do |lib|
+          File.read(lib)
         end.join "\n"
       else lib_paths.is_a? String
         @lib_contents ||= File.read(lib_paths)
@@ -74,11 +75,19 @@ module TypeScript
         options[:bare] = false
       end
 
-      Source.context.call("RubyTypeScriptCompiler", Source.lib_contents, script, options)
+      result = Source.context.call("RubyTypeScriptCompiler", Source.lib_contents, script, options)
+
+      result['log'].each do |lines|
+        JSON.parse(lines).collect { |k, v| v }.each do |message|
+          puts ">> #{ message }"
+        end
+      end
+
+      return result['output']
     end
 
     def test
-      puts ">>>" + compile('/// <reference path="jquery.d.ts" /> jQuery(document).ready(function() { alert("hello!"); });')
+      puts ">>> " + compile("/// <reference path=\"jquery.d.ts\" />\njQuery(document).ready(function() { alert(\"hello!\"); });\nvar a = 9 * -18;").inspect
     end
   end
 end
